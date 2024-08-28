@@ -1,20 +1,29 @@
+import { useEffect } from "react";
+import useConversations from "../../zustand/useConversations";
 import MessageInput from "./MessageInput";
 import Messages from "./Messages";
 import { TiMessages } from "react-icons/ti";
 
 const MessageContainer = () => {
-  const noChatSelected = true;
+  const { selectedConversation, setSelectedConversation } = useConversations();
+
+  //Using this will unselect the selected conversation when a user logs out, so that when he logs in again,
+  //the user will always see the NoChatSelected component
+  useEffect(() => {
+    return () => setSelectedConversation(null);
+  }, [setSelectedConversation]);
+
   return (
     <>
       <div className='md:min-w-[450px] flex flex-col justify-between max-h-[100vh] '>
-        {noChatSelected ? (
+        {!selectedConversation ? (
           <NoChatSelected />
         ) : (
           <>
             {/* Header */}
             <div className='bg-[#333333] px-4 py-2 mb-2'>
               <span className='label-text'>To:</span>{" "}
-              <span className='font-bold'>Hatim</span>
+              <span className='font-bold'>{selectedConversation.fullName}</span>
             </div>
 
             <Messages />

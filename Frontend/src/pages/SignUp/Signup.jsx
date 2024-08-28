@@ -1,14 +1,26 @@
 import { useState } from "react";
-import GenderCheck from "./GenderCheck";
+import { GenderCheck } from "./GenderCheck";
+import { Link } from "react-router-dom";
+import { useSignUp } from "../../hooks/useSignUp";
 
 export const Signup = () => {
-  const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [inputs, setInputs] = useState({
+    fullName: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    gender: "",
+  });
 
-  const handleSignUp = (e) => {
+  const { loading, signup } = useSignUp();
+
+  const handleGender = (gender) => {
+    setInputs({ ...inputs, gender });
+  };
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
+    signup(inputs);
   };
 
   return (
@@ -33,9 +45,9 @@ export const Signup = () => {
                   type='text'
                   className='grow'
                   placeholder='Full Name'
-                  value={fullName}
+                  value={inputs.fullName}
                   onChange={(e) => {
-                    setFullName(e.target.value);
+                    setInputs({ ...inputs, fullName: e.target.value });
                   }}
                 />
               </label>
@@ -54,9 +66,9 @@ export const Signup = () => {
                   type='text'
                   className='grow'
                   placeholder='Username'
-                  value={username}
+                  value={inputs.username}
                   onChange={(e) => {
-                    setUsername(e.target.value);
+                    setInputs({ ...inputs, username: e.target.value });
                   }}
                 />
               </label>
@@ -79,8 +91,10 @@ export const Signup = () => {
                   type='password'
                   className='grow'
                   placeholder='Password'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={inputs.password}
+                  onChange={(e) => {
+                    setInputs({ ...inputs, password: e.target.value });
+                  }}
                 />
               </label>
             </div>
@@ -102,23 +116,36 @@ export const Signup = () => {
                   type='password'
                   className='grow'
                   placeholder='Confirm Password'
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={inputs.confirmPassword}
+                  onChange={(e) => {
+                    setInputs({ ...inputs, confirmPassword: e.target.value });
+                  }}
                 />
               </label>
             </div>
-            <GenderCheck />
+            <GenderCheck
+              onCheckBoxChange={handleGender}
+              selectedGender={inputs.gender}
+            />
             <div>
-              <button type='submit' className='btn btn-block mt-5'>
-                SignUp
+              <button
+                type='submit'
+                className='btn btn-block mt-5'
+                disabled={loading}
+              >
+                {!loading ? (
+                  "SignUp"
+                ) : (
+                  <span className='loading loading-spinner'></span>
+                )}
               </button>
             </div>
-            <a
-              href='#'
+            <Link
+              to='/login'
               className='text-sm hover:underline text-[#333333] hover:text-blue-400 mt-5 inline-block'
             >
               {"Already have an account?"}
-            </a>
+            </Link>
           </form>
         </div>
       </div>

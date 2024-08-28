@@ -1,18 +1,24 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useLogIn } from "../../hooks/useLogIn";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const { loading, login } = useLogIn();
+
   const handleLogin = (e) => {
     e.preventDefault();
+
+    login({ username, password });
   };
 
   return (
     <>
       <div className='flex flex-col justify-center items-center sm:min-w-96 w-64 mx-auto'>
         <div className='h-full p-6 w-full bg-green-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-10'>
-          <h1 className='text-3xl  font-semibold text-center text-gray-300'>
+          <h1 className='text-3xl  font-semibold text-center text-gray-300 mb-16'>
             Login <span className='text-[#333333]'>Murmur</span>
           </h1>
           <form onSubmit={handleLogin}>
@@ -61,16 +67,24 @@ export const Login = () => {
               </label>
             </div>
             <div>
-              <button type='submit' className='btn btn-block mt-5'>
-                Login
+              <button
+                type='submit'
+                className='btn btn-block mt-5'
+                disabled={loading}
+              >
+                {!loading ? (
+                  "Login"
+                ) : (
+                  <span className='loading loading-spinner'></span>
+                )}
               </button>
             </div>
-            <a
-              href='#'
+            <Link
+              to='/signup'
               className='text-sm hover:underline text-[#333333] hover:text-blue-400 mt-5 inline-block'
             >
               {"Don't have an account?"}
-            </a>
+            </Link>
           </form>
         </div>
       </div>
