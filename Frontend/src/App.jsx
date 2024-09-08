@@ -1,32 +1,32 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import "./App.css";
-import Home from "./pages/Home/Home";
-import { Login } from "./pages/Login/Login";
-import { Signup } from "./pages/SignUp/Signup";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import axios from "axios";
+
 import { Toaster } from "react-hot-toast";
-import { useAuthContext } from "./context/AuthContext";
+import Register from "./Pages/Register";
+import Login from "./Pages/Login";
+import { UserContextProvider } from "./Context/UserContext";
+import Chat from "./Pages/Chat";
 
 function App() {
-  const { authUser } = useAuthContext();
-
+  axios.defaults.baseURL = "http://localhost:3000";
+  axios.defaults.withCredentials = true;
   return (
-    <div className='p-4 h-screen flex justify-center items-center'>
-      <Routes>
-        <Route
-          path='/'
-          element={authUser ? <Home /> : <Navigate to='/login' />}
-        />
-        <Route
-          path='/login'
-          element={authUser ? <Navigate to='/' /> : <Login />}
-        />
-        <Route
-          path='/signup'
-          element={authUser ? <Navigate to='/' /> : <Signup />}
-        />
-      </Routes>
-      <Toaster />
-    </div>
+    <UserContextProvider>
+      <Router>
+        <Toaster position='top-center' reverseOrder={false} />
+        <Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/chat' element={<Chat />} />
+          <Route path='*' element={<Navigate to='/login' />} />
+        </Routes>
+      </Router>
+    </UserContextProvider>
   );
 }
 
