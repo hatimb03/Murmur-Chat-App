@@ -32,11 +32,10 @@ const Login = () => {
     //sending data, api call
     try {
       setLoading(true);
-      const response = await axios.post("/login", {
+      const response = await axios.post("/auth/login", {
         username: username,
         password: password,
       });
-      // console.log("login", response);
 
       if (response.data && response.data.token) {
         setLoggedInUsername(response.data.username);
@@ -95,6 +94,7 @@ const Login = () => {
                   type='text'
                   className='grow'
                   placeholder='Username'
+                  autoComplete='Username'
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
@@ -118,6 +118,7 @@ const Login = () => {
                   type='password'
                   className='grow'
                   placeholder='Password'
+                  autoComplete='current-password'
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);

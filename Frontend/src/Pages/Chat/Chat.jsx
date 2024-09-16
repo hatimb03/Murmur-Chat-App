@@ -1,12 +1,12 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Components/Navbar";
-import { IoSendOutline } from "react-icons/io5";
+
 import { UserContext } from "../../Context/UserContext";
 import axios from "axios";
-import UserList from "./UserList";
 import { uniqBy } from "lodash";
-import { getRandomMessage } from "../../utils/showMessageRandom";
+import UserListSection from "./UserListSection/UserListSection";
+import ChatSection from "./ChatSection/ChatSection";
 
 // ... other imports
 
@@ -19,7 +19,6 @@ const Chat = () => {
   const [newMessageText, setNewMessageText] = useState("");
   const [messages, setMessages] = useState([]);
   const { userId } = useContext(UserContext);
-  const divUnderMessages = useRef();
 
   const showOnlinePeople = (peopleArray) => {
     const people = {};
@@ -100,14 +99,7 @@ const Chat = () => {
   }
 
   useEffect(() => {
-    const div = divUnderMessages.current;
-    if (div) {
-      div.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    axios.get("/people").then((res) => {
+    axios.get("/users/people").then((res) => {
       const offlinePeopleArr = res.data.users
         .filter((p) => p._id !== userId)
         .filter((p) => !Object.keys(onlinePeople).includes(p._id));
@@ -161,97 +153,24 @@ const Chat = () => {
       <Navbar isSelectedUser={selectedUserId} onBackClick={onBackClick} />
       <div className='h-screen bg-red-200 flex flex-col md:flex-row'>
         {/* Left Section: User List */}
-        <div
-          className={`left h-full bg-blue-50 w-full md:w-1/3 lg:w-1/4 overflow-auto pt-20 p-6 flex flex-col ${
-            selectedUserId ? "hidden md:flex" : "flex"
-          }`}
-        >
-          {Object.keys(onlinePeopleExcludingUser).map((userId) => (
-            <UserList
-              userId={userId}
-              online={true}
-              selectedUserId={selectedUserId}
-              onlinePeople={onlinePeople}
-              key={userId}
-              onClick={handleUserClick}
-            />
-          ))}
-          {Object.keys(offlinePeople).map((userId) => (
-            <UserList
-              userId={userId}
-              online={false}
-              selectedUserId={selectedUserId}
-              onlinePeople={offlinePeople}
-              key={userId}
-              onClick={handleUserClick}
-            />
-          ))}
-        </div>
+        <UserListSection
+          selectedUserId={selectedUserId}
+          onlinePeople={onlinePeople}
+          onlinePeopleExcludingUser={onlinePeopleExcludingUser}
+          handleUserClick={handleUserClick}
+          offlinePeople={offlinePeople}
+        />
 
         {/* Right Section: Chat View */}
-        <div
-          className={`right bg-white md:w-2/3 lg:w-3/4 h-full pt-20 flex flex-col overflow-hidden  ${
-            selectedUserId ? "flex" : "hidden md:flex"
-          }`}
-        >
-          <div className='flex-1 overflow-auto p-2'>
-            {!selectedUserId && (
-              <div className='p-8 text-zinc-500 text-xl'>
-                <div className='mb-10 text-zinc-400'>{getRandomMessage()}</div>
-                <p>&larr; Select someone to chat</p>
-              </div>
-            )}
-
-            {!!selectedUserId && messages && (
-              <div>
-                {messagesToShow.map((message) => (
-                  <div key={message._id}>
-                    <div
-                      className={`chat ${
-                        message.sender == userId ? "chat-start" : "chat-end"
-                      }`}
-                    >
-                      <div className='chat-bubble bg-blue-500 text-white break-words'>
-                        {message.text}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div ref={divUnderMessages}></div>
-              </div>
-            )}
-
-            {loading && (
-              <span className='loading loading-dots loading-sm'></span>
-            )}
-
-            {!!selectedUserId && !loading && messagesToShow.length === 0 && (
-              <div className='text-center text-zinc-600'>No messages yet!</div>
-            )}
-          </div>
-
-          {!!selectedUserId && (
-            <form
-              className='flex items-center  bg-white border-t p-2'
-              onSubmit={handleMessageSend}
-            >
-              <input
-                type='text'
-                placeholder='Enter your message ...'
-                className='input input-bordered w-full mr-1  relative'
-                value={newMessageText}
-                onChange={(e) => setNewMessageText(e.target.value)}
-              />
-
-              <button
-                type='submit'
-                className='p-4 rounded-md text-xl  bg-blue-500 hover:bg-blue-700 text-white'
-              >
-                <IoSendOutline />
-              </button>
-            </form>
-          )}
-        </div>
+        <ChatSection
+          selectedUserId={selectedUserId}
+          messages={messages}
+          messagesToShow={messagesToShow}
+          loading={loading}
+          handleMessageSend={handleMessageSend}
+          newMessageText={newMessageText}
+          setNewMessageText={setNewMessageText}
+        />
       </div>
     </>
   );

@@ -2,15 +2,17 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 import { UserContext } from "../Context/UserContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const {
     setUsername: setLoggedInUsername,
@@ -27,6 +29,11 @@ const Register = () => {
       return;
     }
 
+    if (password.length < 8) {
+      setError("Password too short, atleast 8 characters required");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       toast.error("Passwords do not match");
@@ -36,21 +43,21 @@ const Register = () => {
 
     //sending the data
     try {
-      const response = await axios.post("/register", {
+      setLoading(true);
+      const response = await axios.post("/auth/register", {
         name,
         username,
         password,
         confirmPassword,
       });
-      setLoggedInUsername(username);
-      setUserId(response.data.userId);
-      setLoggedInName(response.data.name);
-      toast.success(response.data.message);
-      console.log("Response:", response.data);
+      if (response.data && response.data.token) {
+        setLoggedInUsername(username);
+        setUserId(response.data.userId);
+        setLoggedInName(response.data.name);
+        localStorage.setItem("token", response.data.token);
+        toast.success(response.data.message);
+      }
     } catch (err) {
-      console.error("Error Response:", err.response);
-      console.error("Error Message:", err.message);
-
       if (err.response) {
         setError(err.response.data.message || "An error occurred");
         toast.error(err.response.data.message || "An error occurred");
@@ -58,6 +65,9 @@ const Register = () => {
         setError("Network error or unexpected issue");
         toast.error("Network error or unexpected issue");
       }
+    } finally {
+      setLoading(false);
+      navigate("/chat");
     }
   };
 
@@ -104,6 +114,7 @@ const Register = () => {
                   type='text'
                   className='grow'
                   placeholder='Username'
+                  autoComplete='Username'
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
@@ -127,6 +138,7 @@ const Register = () => {
                   type='password'
                   className='grow'
                   placeholder='Password'
+                  autoComplete='new-password'
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -150,14 +162,20 @@ const Register = () => {
                   type='password'
                   className='grow'
                   placeholder='Confirm Password'
+                  autoComplete='off'
                   value={confirmPassword}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
                   }}
                 />
               </label>
+              {error && <p className='text-red-500 text-sm w-3/4'>{error}</p>}
               <button className='btn btn-outline btn-primary' type='submit'>
-                Register
+                {loading ? (
+                  <span className='loading loading-dots'></span>
+                ) : (
+                  "Register"
+                )}
               </button>
               <Link
                 to='/login'

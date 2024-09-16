@@ -10,11 +10,20 @@ export const UserContextProvider = ({ children }) => {
   const [name, setName] = useState(null);
 
   useEffect(() => {
-    axios.get("/profile", { withCredentials: true }).then((response) => {
-      setUserId(response.data.userId);
-      setUsername(response.data.username);
-      setName(response.data.name);
-    });
+    axios
+      .get("/auth/profile", { withCredentials: true })
+      .then((response) => {
+        setUserId(response.data.userId);
+        setUsername(response.data.username);
+        setName(response.data.name);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          console.log("No user logged in");
+        } else {
+          console.log("Error fetching profile:", error);
+        }
+      });
   }, []);
 
   return (

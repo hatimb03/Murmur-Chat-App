@@ -18,7 +18,7 @@ const Navbar = ({ isSelectedUser, onBackClick }) => {
 
   async function handleLogout() {
     try {
-      await axios.get("/logout");
+      await axios.get("/auth/logout");
 
       localStorage.removeItem("token");
     } catch (err) {
@@ -37,6 +37,7 @@ const Navbar = ({ isSelectedUser, onBackClick }) => {
             onClick={onBackClick}
           />
         )}
+
         <div className='flex items-center justify-center flex-grow'>
           <BiSolidMessageRounded className='text-blue-500 text-2xl' />
           <h1 className='text-blue-500 text-center text-2xl '>Murmur</h1>
