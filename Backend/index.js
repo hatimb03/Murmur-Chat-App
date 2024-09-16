@@ -8,7 +8,7 @@ const cors = require("cors");
 const ws = require("ws");
 const messageModel = require("./models/messageModel");
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 dotenv.config();
 

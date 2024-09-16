@@ -13,7 +13,7 @@ import { UserContextProvider } from "./Context/UserContext";
 import Chat from "./Pages/Chat/Chat";
 
 function App() {
-  axios.defaults.baseURL = "http://localhost:3000";
+  axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
   axios.defaults.withCredentials = true;
   return (
     <UserContextProvider>
