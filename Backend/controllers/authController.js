@@ -56,7 +56,11 @@ const register = async function (req, res) {
             { userId: user._id, username: user.username, name: user.name },
             process.env.JWT_SECRET
           );
-          res.cookie("token", token, { httpOnly: true });
+          res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "Lax",
+          });
 
           return res.status(200).json({
             error: false,
@@ -110,7 +114,7 @@ const login = async function (req, res) {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "None",
+      sameSite: "Lax",
       secure: true,
     });
 
@@ -154,6 +158,8 @@ const profile = async function (req, res) {
 const logout = function (req, res) {
   res.cookie("token", "", {
     httpOnly: true,
+    secure: true,
+    sameSite: "Lax",
     expires: new Date(0),
   });
 
