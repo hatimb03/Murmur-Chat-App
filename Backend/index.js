@@ -72,6 +72,8 @@ wss.on("connection", (connection, req) => {
           connection.name = name;
           connection.username = username;
           connection.userId = userId;
+
+          notifyAboutOnlinePeople();
         });
       }
     }
@@ -105,9 +107,6 @@ wss.on("connection", (connection, req) => {
       console.error("Error handling message:", error);
     }
   });
-
-  // Showing online people
-  notifyAboutOnlinePeople();
 });
 
 wss.on("close", (data) => {
