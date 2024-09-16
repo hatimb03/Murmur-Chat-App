@@ -59,7 +59,7 @@ const register = async function (req, res) {
           res.cookie("token", token, {
             httpOnly: true,
             secure: true,
-            sameSite: "Lax",
+            sameSite: "None",
           });
 
           return res.status(200).json({
@@ -114,7 +114,7 @@ const login = async function (req, res) {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "None",
       secure: true,
     });
 
@@ -159,7 +159,7 @@ const logout = function (req, res) {
   res.cookie("token", "", {
     httpOnly: true,
     secure: true,
-    sameSite: "Lax",
+    sameSite: "None",
     expires: new Date(0),
   });
 

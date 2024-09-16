@@ -38,10 +38,10 @@ const wss = new ws.WebSocketServer({ server });
 
 wss.on("connection", (connection, req) => {
   function notifyAboutOnlinePeople() {
-    wss.clients.forEach((client) => {
+    [...wss.clients].forEach((client) => {
       client.send(
         JSON.stringify({
-          online: wss.clients.map((c) => ({
+          online: [...wss.clients].map((c) => ({
             userId: c.userId,
             username: c.username,
             name: c.name,
@@ -72,8 +72,6 @@ wss.on("connection", (connection, req) => {
           connection.name = name;
           connection.username = username;
           connection.userId = userId;
-
-          notifyAboutOnlinePeople();
         });
       }
     }
@@ -107,6 +105,9 @@ wss.on("connection", (connection, req) => {
       console.error("Error handling message:", error);
     }
   });
+
+  // Showing online people
+  notifyAboutOnlinePeople();
 });
 
 wss.on("close", (data) => {
