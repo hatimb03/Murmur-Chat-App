@@ -8,9 +8,9 @@ const cors = require("cors");
 const ws = require("ws");
 const messageModel = require("./models/messageModel");
 
-const PORT = process.env.PORT || 3000;
-
 dotenv.config();
+
+const PORT = process.env.PORT || 3000;
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
@@ -33,6 +33,7 @@ const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+// Initialize WebSocket server with the HTTP server instance
 const wss = new ws.WebSocketServer({ server });
 
 wss.on("connection", (connection, req) => {
@@ -50,13 +51,13 @@ wss.on("connection", (connection, req) => {
     });
   }
 
-  //reading the name, username, id from the cookie for connection establishment
+  // Reading the name, username, id from the cookie for connection establishment
   const cookies = req.headers.cookie;
 
   if (cookies) {
     const tokenCookieString = cookies
       .split(";")
-      .find((str) => str.startsWith("token=")); //.split to segregate if many cookies are presenet
+      .find((str) => str.startsWith("token="));
     if (tokenCookieString) {
       const token = tokenCookieString.split("=")[1];
       if (token) {
@@ -105,7 +106,7 @@ wss.on("connection", (connection, req) => {
     }
   });
 
-  //Showing online poeple
+  // Showing online people
   notifyAboutOnlinePeople();
 });
 
