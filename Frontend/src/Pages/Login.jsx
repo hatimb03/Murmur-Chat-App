@@ -7,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +18,7 @@ const Login = () => {
     setName: setLoggedInName,
   } = useContext(UserContext);
 
-  const handleRegister = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!username || !password) {
@@ -50,17 +49,26 @@ const Login = () => {
       }
 
       toast.success(response.data.message);
-
-      navigate("/chat");
     } catch (err) {
-      console.log(err);
+      setLoading(false);
+      if (err.response && err.response.data) {
+        setError(err.response.data.message);
+        toast.error(err.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+        toast.error("An error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
+      navigate("/chat");
     }
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
 
     if (token) return navigate("/chat");
   }, [navigate]);
@@ -73,7 +81,7 @@ const Login = () => {
               Welcome to <span className='text-blue-400'>Murmur</span>
             </h2>
             <h3 className='text-center text-xl font-bold mb-6'>Login</h3>
-            <form className='flex flex-col gap-4' onSubmit={handleRegister}>
+            <form className='flex flex-col gap-4' onSubmit={handleLogin}>
               <label className='input input-bordered flex items-center gap-2'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'

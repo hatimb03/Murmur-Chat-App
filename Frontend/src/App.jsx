@@ -10,7 +10,7 @@ import { Toaster } from "react-hot-toast";
 import Register from "./Pages/Register";
 import Login from "./Pages/Login";
 import { UserContextProvider } from "./Context/UserContext";
-import Chat from "./Pages/Chat";
+import Chat from "./Pages/Chat/Chat";
 
 function App() {
   axios.defaults.baseURL = "http://localhost:3000";
