@@ -1,3 +1,5 @@
+//The data of offline people can be seen in the network tab, but the frontend doesnt shwo the data, which means that there is some problem in the frontend of the site, the backend is working fine
+
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Components/Navbar";
@@ -8,8 +10,6 @@ import { uniqBy } from "lodash";
 import UserListSection from "./UserListSection/UserListSection";
 import ChatSection from "./ChatSection/ChatSection";
 
-// ... other imports
-
 const Chat = () => {
   const [loading, setLoading] = useState(false);
   const [ws, setWs] = useState(null);
@@ -19,6 +19,8 @@ const Chat = () => {
   const [newMessageText, setNewMessageText] = useState("");
   const [messages, setMessages] = useState([]);
   const { userId } = useContext(UserContext);
+
+  const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
 
   const showOnlinePeople = (peopleArray) => {
     const people = {};
@@ -33,7 +35,10 @@ const Chat = () => {
   }, []);
 
   function connectToWs() {
-    const ws = new WebSocket("ws://localhost:3000");
+    // const wsUrl = "wss://murmur-chat-app.onrender.com";
+    const wsUrl = websocketUrl;
+    const ws = new WebSocket(wsUrl);
+
     setWs(ws);
 
     ws.addEventListener("message", handleMessage);
@@ -48,7 +53,7 @@ const Chat = () => {
   const handleMessage = (e) => {
     const messageData = JSON.parse(e.data);
 
-    if (`online` in messageData) {
+    if ("online" in messageData) {
       try {
         setLoading(true);
         showOnlinePeople(messageData.online);
@@ -57,7 +62,7 @@ const Chat = () => {
       } finally {
         setLoading(false);
       }
-    } else if (`text` in messageData) {
+    } else if ("text" in messageData) {
       setMessages((prev) => [...prev, { ...messageData }]);
     }
   };
@@ -99,16 +104,22 @@ const Chat = () => {
   }
 
   useEffect(() => {
-    axios.get("/users/people").then((res) => {
-      const offlinePeopleArr = res.data.users
-        .filter((p) => p._id !== userId)
-        .filter((p) => !Object.keys(onlinePeople).includes(p._id));
-      const offlinePeople = {};
-      offlinePeopleArr.forEach((p) => {
-        offlinePeople[p._id] = p;
+    axios
+      .get("/users/people")
+      .then((res) => {
+        const data = res.data.users || [];
+        const offlinePeopleArr = data
+          .filter((p) => p._id !== userId)
+          .filter((p) => !Object.keys(onlinePeople).includes(p._id));
+        const offlinePeople = {};
+        offlinePeopleArr.forEach((p) => {
+          offlinePeople[p._id] = p;
+        });
+        setOfflinePeople(offlinePeople);
+      })
+      .catch((error) => {
+        console.error("Error fetching users:", error);
       });
-      setOfflinePeople(offlinePeople);
-    });
   }, [onlinePeople, userId]);
 
   async function getMessages() {

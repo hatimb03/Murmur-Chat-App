@@ -13,7 +13,9 @@ import { UserContextProvider } from "./Context/UserContext";
 import Chat from "./Pages/Chat/Chat";
 
 function App() {
-  axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  axios.defaults.baseURL = apiUrl;
   axios.defaults.withCredentials = true;
   return (
     <UserContextProvider>
