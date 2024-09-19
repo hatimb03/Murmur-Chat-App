@@ -1,5 +1,8 @@
 # Murmur-Chat-App
 
+Hosted On
+murmur-chatapp.netlify.app
+
 Murmur Chat App
 A modern chat application designed for real-time communication. Built with React and Express, this app supports live messaging and user authentication, featuring a responsive design and WebSocket integration.
 
